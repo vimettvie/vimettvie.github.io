@@ -1,1 +1,46 @@
- m
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: transparent; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; color: white; }
+        #timer { font-size: 80px; font-weight: 700; text-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .controls { position: fixed; bottom: 20px; display: flex; gap: 10px; }
+        button { background: #444; border: none; color: white; padding: 10px 20px; cursor: pointer; border-radius: 8px; font-weight: bold; }
+        button:hover { background: #666; }
+    </style>
+</head>
+<body>
+
+<div id="timer">00:00</div>
+
+<div class="controls">
+    <button onclick="changeTime(-60)">-1 хв</button>
+    <button onclick="changeTime(60)">+1 хв</button>
+</div>
+
+<script>
+    let time = 300; // Початковий час в секундах (5 хв)
+    const display = document.getElementById('timer');
+
+    function updateDisplay() {
+        let mins = Math.floor(time / 60);
+        let secs = time % 60;
+        display.innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function changeTime(seconds) {
+        time = Math.max(0, time + seconds);
+        updateDisplay();
+    }
+
+    setInterval(() => {
+        if (time > 0) {
+            time--;
+            updateDisplay();
+        }
+    }, 1000);
+
+    updateDisplay();
+</script>
+</body>
+</html>
