@@ -1,0 +1,10 @@
+<script>
+    function changeTime(delta) {
+        let current = parseInt(localStorage.getItem('timerValue')) || 300;
+        let newValue = Math.max(0, current + delta);
+        
+        localStorage.setItem('timerValue', newValue); // Оновлюємо значення
+    }
+</script>
+<button onclick="changeTime(60)">+1 Хв</button>
+<button onclick="changeTime(-60)">-1 Хв</button>
