@@ -1,10 +1,70 @@
-<script>
-    function changeTime(delta) {
-        let current = parseInt(localStorage.getItem('timerValue')) || 300;
-        let newValue = Math.max(0, current + delta);
-        
-        localStorage.setItem('timerValue', newValue); // Оновлюємо значення
-    }
-</script>
-<button onclick="changeTime(60)">+1 Хв</button>
-<button onclick="changeTime(-60)">-1 Хв</button>
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 50px; }
+        .timer-val { font-size: 48px; font-weight: bold; font-variant-numeric: tabular-nums; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        button { padding: 15px 25px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; transition: 0.2s; background: #333; color: white; }
+        button:hover { background: #444; transform: translateY(-2px); }
+        .main-btn { background: #007AFF; grid-column: span 2; font-size: 20px; }
+        .main-btn.active { background: #FF3B30; }
+    </style>
+</head>
+<body>
+    <div class="timer-val" id="display">00:00</div>
+    
+    <div class="grid">
+        <button class="main-btn" id="startStop" onclick="toggleTimer()">START</button>
+        <button onclick="changeTime(60)">+1 Хв</button>
+        <button onclick="changeTime(-60)">-1 Хв</button>
+        <button onclick="changeTime(1)">+1 Сек</button>
+        <button onclick="changeTime(-1)">-1 Сек</button>
+    </div>
+
+    <script>
+        let time = 300;
+        let isRunning = false;
+        let timerInterval;
+
+        function update() {
+            let mins = Math.floor(time / 60);
+            let secs = time % 60;
+            let formatted = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            document.getElementById('display').innerText = formatted;
+            
+            // Відправляємо в OBS через localStorage
+            localStorage.setItem('timer_data', JSON.stringify({ time: formatted, isRunning }));
+        }
+
+        function toggleTimer() {
+            isRunning = !isRunning;
+            const btn = document.getElementById('startStop');
+            btn.innerText = isRunning ? "PAUSE" : "START";
+            btn.className = isRunning ? "main-btn active" : "main-btn";
+
+            if (isRunning) {
+                timerInterval = setInterval(() => {
+                    if (time > 0) {
+                        time--;
+                        update();
+                    } else {
+                        toggleTimer();
+                    }
+                }, 1000);
+            } else {
+                clearInterval(timerInterval);
+                update();
+            }
+        }
+
+        function changeTime(delta) {
+            time = Math.max(0, time + delta);
+            update();
+        }
+
+        // Ініціалізація
+        update();
+    </script>
+</body>
+</html>
