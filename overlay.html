@@ -1,0 +1,17 @@
+<script>
+    const display = document.getElementById('timer');
+    
+    // Слухаємо зміни в localStorage
+    window.addEventListener('storage', (event) => {
+        if (event.key === 'timerValue') {
+            updateDisplay(event.newValue);
+        }
+    });
+
+    function updateDisplay(seconds) {
+        let mins = Math.floor(seconds / 60);
+        let secs = seconds % 60;
+        document.getElementById('timer').innerText = 
+            `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+</script>
