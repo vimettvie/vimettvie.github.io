@@ -30,12 +30,11 @@ class handler(BaseHTTPRequestHandler):
                         val = c.get('value', '')
                         f.write(f"{domain}\t{flag}\t{p}\t{sec}\t{exp}\t{name}\t{val}\n")
             opts = {
-                'format': 'best[ext=mp4]/best',
+                'format': 'best[ext=mp4]/best', 
                 'cookiefile': cookie_path if raw_cookies else None,
                 'quiet': True,
                 'no_warnings': True,
                 'nocheckcertificate': True,
-
                 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
             }
             with yt_dlp.YoutubeDL(opts) as ydl:
