@@ -3,169 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>youtube downloader --inhook</title>
+    <title>INH.OOK</title>
     <style>
-        :root {
-            --bg-color: #000000;
-            --text-color: #00ff41;
-            --border-color: #008f11;
-        }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Courier New', Courier, monospace;
+            background-color: #000;
+            color: #00ff41;
+            font-family: 'Courier New', monospace;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
+            height: 100vh;
             margin: 0;
-            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .container {
-            border: 1px solid var(--text-color);
-            padding: 30px;
-            width: 90%;
-            max-width: 650px;
-            box-shadow: 0 0 10px var(--border-color);
+        .main {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
         }
 
-        h1 {
-            font-size: 24px;
-            text-align: center;
-            border-bottom: 1px solid var(--text-color);
-            padding-bottom: 10px;
-            margin-top: 0;
+        .label {
+            margin-bottom: 10px;
+            font-size: 14px;
+            opacity: 0.8;
         }
 
-        .status-bar {
-            font-size: 12px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .input-area {
-            margin: 40px 0;
-        }
-
-        input[type="text"] {
-            background: #000;
-            border: 1px solid var(--text-color);
-            color: var(--text-color);
-            padding: 12px;
-            width: calc(100% - 26px);
-            font-size: 16px;
+        input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #00ff41;
+            color: #00ff41;
+            font-size: 18px;
+            padding: 5px 0;
             outline: none;
-            font-family: 'Courier New', Courier, monospace;
+            font-family: inherit;
         }
 
         button {
-            background: transparent;
-            color: var(--text-color);
-            border: 1px solid var(--text-color);
-            padding: 10px 25px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 15px;
+            background: #00ff41;
+            color: #000;
+            border: none;
             width: 100%;
-            font-family: 'Courier New', Courier, monospace;
+            padding: 12px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: inherit;
+            text-transform: uppercase;
         }
 
         button:hover {
-            background: var(--text-color);
-            color: #000;
+            background: #00cc33;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 12px;
+            min-height: 20px;
         }
 
         #result {
             margin-top: 30px;
             display: none;
-            border: 1px dashed var(--text-color);
-            padding: 20px;
+            border-top: 1px solid #333;
+            padding-top: 20px;
         }
 
-        .download-link {
+        a {
+            color: #00ff41;
+            text-decoration: underline;
             display: block;
-            margin-top: 20px;
-            color: #000;
-            background: var(--text-color);
-            text-decoration: none;
-            padding: 15px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .loader {
-            display: none;
-            text-align: center;
-            margin: 15px 0;
-        }
-
-        footer {
-            margin-top: 30px;
-            font-size: 10px;
-            letter-spacing: 2px;
+            margin-top: 10px;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="status-bar">
-            <span>CORE_v1.0</span>
-            <span>STATUS: ONLINE</span>
-        </div>
+    <div class="main">
+        <div class="label">> SOURCE_URL</div>
+        <input type="text" id="url" placeholder="..." autocomplete="off">
+        <button onclick="fetchVideo()">EXECUTE</button>
         
-        <h1>Inhook Video Downloader</h1>
-        
-        <div class="input-area">
-            <div>> USER_INPUT_URL:</div>
-            <br>
-            <input type="text" id="videoUrl" placeholder="ENTER LINK HERE..." spellcheck="false">
-            <button onclick="runExploit()">EXECUTE FETCH</button>
-        </div>
-
-        <div id="loader" class="loader">ACCESSING REMOTE SERVER... [##########]</div>
+        <div id="status"></div>
 
         <div id="result">
-            <div id="videoTitle" style="margin-bottom: 10px;">FILE: UNKNOWN</div>
-            <div style="font-size: 12px; margin-bottom: 15px;">SOURCE: YOUTUBE_DATABASE</div>
-            <a href="#" id="downloadLink" class="download-link" target="_blank">DOWNLOAD_STREAM</a>
+            <div id="title"></div>
+            <a id="link" target="_blank">[ DOWNLOAD_FILE ]</a>
         </div>
     </div>
 
-    <footer>
-        SECURE CONNECTION ESTABLISHED // 2026
-    </footer>
-
     <script>
-        async function runExploit() {
-            const urlInput = document.getElementById('videoUrl').value;
-            const resultDiv = document.getElementById('result');
-            const loader = document.getElementById('loader');
+        async function fetchVideo() {
+            const url = document.getElementById('url').value;
+            const status = document.getElementById('status');
+            const result = document.getElementById('result');
             
-            if (!urlInput) return;
+            if (!url) return;
 
-            loader.style.display = 'block';
-            resultDiv.style.display = 'none';
+            status.innerText = 'FETCHING...';
+            result.style.display = 'none';
 
             try {
-                const response = await fetch(`/api/get_video?url=${encodeURIComponent(urlInput)}`);
-                const data = await response.json();
+                const res = await fetch(`/api/get_video?url=${encodeURIComponent(url)}`);
+                const data = await res.json();
 
                 if (data.status === 'ok') {
-                    document.getElementById('videoTitle').innerText = `FILE: ${data.title}`;
-                    document.getElementById('downloadLink').href = data.url;
-                    resultDiv.style.display = 'block';
+                    status.innerText = 'SUCCESS';
+                    document.getElementById('title').innerText = data.title;
+                    document.getElementById('link').href = data.url;
+                    result.style.display = 'block';
                 } else {
-                    alert('STREAMS_ERROR: ' + data.error);
+                    status.innerText = 'ERROR: INVALID_LINK';
                 }
-            } catch (error) {
-                alert('CONNECTION_FAILED');
-            } finally {
-                loader.style.display = 'none';
+            } catch (e) {
+                status.innerText = 'ERROR: SERVER_OFFLINE';
             }
         }
     </script>
