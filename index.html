@@ -16,7 +16,6 @@ body{background:#000;color:#fff;font-family:'Kalnia',serif;height:100vh;display:
 #url_in{flex:1;background:#151515;color:#fff;border:none;border-radius:6px;padding:18px 25px;font-family:inherit;font-size:18px;outline:none}
 #url_in::placeholder{color:#222}
 .go-btn{background:#252525;color:#fff;border:none;border-radius:6px;padding:0 40px;font-family:inherit;font-size:18px;cursor:pointer}
-.go-btn:hover{background:#333}
 #res_box{margin-top:50px;display:none;background:#111;padding:25px;border-radius:8px}
 .dl-btn{display:inline-block;background:#fff;color:#000;text-decoration:none;padding:12px 25px;border-radius:4px;font-weight:bold;margin-top:15px}
 </style>
@@ -28,55 +27,56 @@ body{background:#000;color:#fff;font-family:'Kalnia',serif;height:100vh;display:
         <div class="logo-txt">YouTube<br>Downloader</div>
         <div id="clk">00:00 --</div>
     </div>
-
     <div class="input-wrap">
-        <input type="text" id="url_in" placeholder="URL" autocomplete="off">
+        <input type="text" id="url_in" placeholder="URL">
         <button class="go-btn" id="btn_go">Enter</button>
     </div>
-
     <div id="res_box">
-        <div id="vid_name" style="font-size:16px;margin-bottom:10px"></div>
+        <div id="vid_name" style="font-size:16px;margin-bottom:10px">Ready to download</div>
         <a href="#" id="final_link" class="dl-btn" target="_blank">Download File</a>
     </div>
 </div>
+
 <script>
 const clk = document.getElementById('clk');
 const inp = document.getElementById('url_in');
 const go = document.getElementById('btn_go');
 const out = document.getElementById('res_box');
-// clock
+
 setInterval(() => {
     let d = new Date();
-    let h = d.getHours();
-    let m = d.getMinutes();
-    let s = h >= 12 ? 'PM' : 'AM';
+    let h = d.getHours(), m = d.getMinutes(), s = h >= 12 ? 'PM' : 'AM';
     h = h % 12 || 12;
     clk.textContent = h + ':' + (m < 10 ? '0' + m : m) + ' ' + s;
 }, 1000);
+
 const getIt = async () => {
     let val = inp.value.trim();
     if(!val) return;
     go.disabled = true;
     go.textContent = '...';
     out.style.display = 'none';
-    try {
-        let r = await fetch('/api/get_video?url=' + encodeURIComponent(val));
-        let res = await r.json();
 
-        if(res.status == 'ok') {
-            document.getElementById('vid_name').textContent = res.title;
+    try {
+        const r = await fetch('/api/get_video?url=' + encodeURIComponent(val));
+        const res = await r.json();
+        
+        console.log("RAW_RES:", res); // ДИВИСЬ СЮДИ В КОНСОЛЬ
+
+        if (res.status === 'ok' && res.url) {
             document.getElementById('final_link').href = res.url;
             out.style.display = 'block';
         } else {
-            alert('error');
+            alert('API ERROR: ' + (res.msg || 'unknown'));
         }
     } catch(e) {
-        console.log(e);
+        alert('FETCH ERROR: ' + e.message);
     } finally {
         go.disabled = false;
         go.textContent = 'Enter';
     }
 };
+
 go.onclick = getIt;
 inp.onkeypress = (e) => { if(e.key == 'Enter') getIt(); };
 </script>
