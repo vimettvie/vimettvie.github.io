@@ -14,13 +14,15 @@ class handler(BaseHTTPRequestHandler):
         s.send_header('Access-Control-Allow-Origin', '*')
         s.end_headers()
         
-        if not v_url:
-            s.wfile.write(json.dumps({"status": "err", "msg": "No URL provided"}).encode())
-            return
+        if not v_url: return
 
-        # Пробуємо цей інстанс, він зараз найживіший
-        api_url = "cobalt.hot-as.it" 
-        # Якщо знову буде NameResolutionError, спробуй цей: "https://api.cobalt.tools/"
+        # Список свіжих інстансів, які зараз найменше забанені
+        instances = [
+            "https://api.cobalt.tools/",
+            "https://cobalt.hot-as.it/",
+            "https://cobalt.as93.net/",
+            "https://api.v0.sh/"
+        ]
         
         headers = {
             "Accept": "application/json",
@@ -29,31 +31,30 @@ class handler(BaseHTTPRequestHandler):
         
         payload = {
             "url": v_url,
-            "videoQuality": "720"
+            "videoQuality": "720",
+            "filenameStyle": "basic"
         }
 
-        try:
-            # Збільшуємо таймаут, бо Cobalt іноді довго думає
-            r = requests.post(api_url, json=payload, headers=headers, timeout=15)
-            
-            # Якщо перший сервак лежить, ми миттєво переключаємося на резервний
-            if r.status_code != 200:
-                fallback_url = "https://api.cobalt.tools/"
-                r = requests.post(fallback_url, json=payload, headers=headers, timeout=15)
+        success = False
+        for api_url in instances:
+            try:
+                # Пробуємо кожен інстанс по черзі
+                r = requests.post(api_url, json=payload, headers=headers, timeout=8)
+                if r.status_code == 200:
+                    data = r.json()
+                    if data.get('url'):
+                        s.wfile.write(json.dumps({
+                            "status": "ok",
+                            "url": data.get('url'),
+                            "title": "Finally Found a Way!"
+                        }).encode())
+                        success = True
+                        break
+            except:
+                continue # Якщо цей інстанс лежить, йдемо до наступного
 
-            data = r.json()
-            
-            # В v10 посилання лежить прямо в data['url']
-            if data.get('url'):
-                res = {
-                    "status": "ok",
-                    "url": data.get('url'),
-                    "title": "Success (Final Boss Defeated)"
-                }
-            else:
-                res = {"status": "err", "msg": data.get('text', 'API returned no URL')}
-            
-            s.wfile.write(json.dumps(res).encode())
-
-        except Exception as e:
-            s.wfile.write(json.dumps({"status": "err", "msg": f"Final Attempt Error: {str(e)}"}).encode())
+        if not success:
+            s.wfile.write(json.dumps({
+                "status": "err", 
+                "msg": "Всі дзеркала Cobalt зараз під баном YouTube. Треба почекати або оновити кукі на власному сервері."
+            }).encode())
