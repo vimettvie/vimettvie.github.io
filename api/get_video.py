@@ -1,5 +1,6 @@
 import requests
 import json
+import os
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 
@@ -16,45 +17,32 @@ class handler(BaseHTTPRequestHandler):
         
         if not v_url: return
 
-        # Список свіжих інстансів, які зараз найменше забанені
-        instances = [
-            "https://api.cobalt.tools/",
-            "https://cobalt.hot-as.it/",
-            "https://cobalt.as93.net/",
-            "https://api.v0.sh/"
-        ]
+        # Використовуємо один з найстабільніших API на RapidAPI
+        # Тобі треба просто вставити свій ключ у змінні оточення Vercel (RAPID_API_KEY)
+        api_key = os.environ.get("RAPID_API_KEY", "3dbed9723amsha66db189e9d4a2ep1c1f93jsn6a95c76d9cd6")
         
+        url = "https://youtube-video-download-info.p.rapidapi.com/dl"
+        querystring = {"id": v_url.split("v=")[-1].split("&")[0]} # Витягуємо ID відео
+
         headers = {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
-        }
-        
-        payload = {
-            "url": v_url,
-            "videoQuality": "720",
-            "filenameStyle": "basic"
+            "X-RapidAPI-Key": api_key,
+            "X-RapidAPI-Host": "youtube-video-download-info.p.rapidapi.com"
         }
 
-        success = False
-        for api_url in instances:
-            try:
-                # Пробуємо кожен інстанс по черзі
-                r = requests.post(api_url, json=payload, headers=headers, timeout=8)
-                if r.status_code == 200:
-                    data = r.json()
-                    if data.get('url'):
-                        s.wfile.write(json.dumps({
-                            "status": "ok",
-                            "url": data.get('url'),
-                            "title": "Finally Found a Way!"
-                        }).encode())
-                        success = True
-                        break
-            except:
-                continue # Якщо цей інстанс лежить, йдемо до наступного
+        try:
+            r = requests.get(url, headers=headers, params=querystring, timeout=10)
+            data = r.json()
+            if data.get('status') == 'ok':
+                links = data.get('link', {})
+                download_url = list(links.values())[0][0] 
+                res = {
+                    "status": "ok",
+                    "url": download_url,
+                    "title": data.get('title', 'Video')
+                }
+            else:
+                res = {"status": "err", "msg": "RapidAPI: Video not found or limit reached"}
+            s.wfile.write(json.dumps(res).encode())
 
-        if not success:
-            s.wfile.write(json.dumps({
-                "status": "err", 
-                "msg": "Всі дзеркала Cobalt зараз під баном YouTube. Треба почекати або оновити кукі на власному сервері."
-            }).encode())
+        except Exception as e:
+            s.wfile.write(json.dumps({"status": "err", "msg": f"System Error: {str(e)}"}).encode())
