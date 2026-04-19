@@ -30,7 +30,7 @@ class handler(BaseHTTPRequestHandler):
                         val = c.get('value', '')
                         f.write(f"{domain}\t{flag}\t{p}\t{sec}\t{exp}\t{name}\t{val}\n")
             opts = {
-                'format': 'best[vcodec!=none][acodec!=none]',
+                'format': '22/18/best[vcodec!=none][acodec!=none]',
                 'cookiefile': cookie_path if raw_cookies else None,
                 'quiet': True,
                 'no_warnings': True,
