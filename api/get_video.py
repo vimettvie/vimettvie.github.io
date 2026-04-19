@@ -1,41 +1,55 @@
+import requests
+import json
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
-import json
-import yt_dlp
+
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        query = urlparse(self.path).query
-        params = parse_qs(query)
-        video_url = params.get('url', [None])[0]
-        if not video_url:
-            self.send_response(400)
-            self.send_header('Content-type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(json.dumps({"error": "No URL provided"}).encode())
+        s = self
+        q = parse_qs(urlparse(s.path).query)
+        v_url = q.get('url', [None])[0]
+
+        s.send_response(200)
+        s.send_header('Content-type', 'application/json')
+        s.send_header('Access-Control-Allow-Origin', '*')
+        s.end_headers()
+
+        if not v_url:
+            s.wfile.write(json.dumps({"status": "error"}).encode())
             return
-        ydl_opts = {
-            'format': 'best[ext=mp4]',
-            'quiet': True,
-            'no_warnings': True,
-            'youtube_include_dash_manifest': False,
-            'extract_flat': True, 
-        }
+
         try:
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(video_url, download=False)
-                response_data = {
+            api = "https://api.cobalt.tools/api/json"
+            headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "url": v_url,
+                "videoQuality": "720",
+                "vCodec": "h264",
+                "isAudioOnly": False
+            }
+            
+            r = requests.post(api, json=payload, headers=headers)
+            data = r.json()
+
+            if data.get('status') == 'stream':
+                res = {
                     "status": "ok",
-                    "url": info.get('url'),
-                    "title": info.get('title'),
-                    "thumbnail": info.get('thumbnail')
+                    "url": data.get('url'),
+                    "title": "Video Ready"
                 }
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(json.dumps(response_data).encode())
+            elif data.get('status') == 'redirect':
+                res = {
+                    "status": "ok",
+                    "url": data.get('url'),
+                    "title": "Redirect Ready"
+                }
+            else:
+                res = {"status": "error", "msg": data.get('text')}
+
+            s.wfile.write(json.dumps(res).encode())
+
         except Exception as e:
-            self.send_response(500)
-            self.end_headers()
-            self.wfile.write(str(e).encode())
+            s.wfile.write(json.dumps({"status": "error", "dev": str(e)}).encode())
