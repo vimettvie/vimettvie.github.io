@@ -18,43 +18,42 @@ class handler(BaseHTTPRequestHandler):
             s.wfile.write(json.dumps({"status": "err", "msg": "No URL provided"}).encode())
             return
 
-        # Актуальний API Cobalt (v10+)
-        api_url = "https://api.cobalt.tools/"
+        # Пробуємо цей інстанс, він зараз найживіший
+        api_url = "https://cobalt-api.v0.sh/" 
+        # Якщо знову буде NameResolutionError, спробуй цей: "https://api.cobalt.tools/"
         
         headers = {
             "Accept": "application/json",
             "Content-Type": "application/json"
         }
         
-        # Новий формат тіла запиту для v10
         payload = {
             "url": v_url,
-            "videoQuality": "720", # v10 використовує videoQuality замість vQuality
-            "filenameStyle": "basic"
+            "videoQuality": "720"
         }
 
         try:
-            # Важливо: Cobalt v10 часто вимагає POST запит на корінь або /
-            r = requests.post(api_url, json=payload, headers=headers, timeout=10)
+            # Збільшуємо таймаут, бо Cobalt іноді довго думає
+            r = requests.post(api_url, json=payload, headers=headers, timeout=15)
             
+            # Якщо перший сервак лежить, ми миттєво переключаємося на резервний
             if r.status_code != 200:
-                # Якщо головний сервер лежить, пробуємо офіційне дзеркало
-                alt_url = "https://cobalt.api.v0.sh/"
-                r = requests.post(alt_url, json=payload, headers=headers, timeout=10)
+                fallback_url = "https://api.cobalt.tools/"
+                r = requests.post(fallback_url, json=payload, headers=headers, timeout=15)
 
             data = r.json()
             
-            # У v10 статус зазвичай 'tunnel', 'redirect' або 'picker'
-            if data.get('status') in ['stream', 'video', 'picker', 'redirect', 'tunnel']:
+            # В v10 посилання лежить прямо в data['url']
+            if data.get('url'):
                 res = {
                     "status": "ok",
                     "url": data.get('url'),
-                    "title": "Success (v10)"
+                    "title": "Success (Final Boss Defeated)"
                 }
             else:
-                res = {"status": "err", "msg": data.get('text', 'Cobalt API error')}
+                res = {"status": "err", "msg": data.get('text', 'API returned no URL')}
             
             s.wfile.write(json.dumps(res).encode())
 
         except Exception as e:
-            s.wfile.write(json.dumps({"status": "err", "msg": f"API Error: {str(e)}"}).encode())
+            s.wfile.write(json.dumps({"status": "err", "msg": f"Final Attempt Error: {str(e)}"}).encode())
