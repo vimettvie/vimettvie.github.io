@@ -31,25 +31,29 @@ class handler(BaseHTTPRequestHandler):
                 'cookiefile': cookie_path if raw_cookies else None,
                 'quiet': True,
                 'no_warnings': True,
-                'check_formats': False, 
-                'extract_flat': False,
+                'ignoreerrors': True,
+                'format': '18/22/best', 
+                'no_check_certificate': True,
+                'youtube_include_dash_manifest': False, 
+                'youtube_include_hls_manifest': False,
             }
 
             with yt_dlp.YoutubeDL(opts) as ydl:
                 info = ydl.extract_info(u, download=False)
-                formats = info.get('formats', [])
-                link = None
-                for f in reversed(formats): 
-                    if f.get('vcodec') != 'none' and f.get('acodec') != 'none' and f.get('url'):
-                        link = f['url']
-                        break
                 
-                if link:
-                    res = {"status": "ok", "url": link, "title": info.get('title')}
+                if not info:
+                    raise Exception("YouTube denied info. IP might be flagged.")
+                url = info.get('url')
+                if not url and 'formats' in info:
+                    for f in info['formats']:
+                        if f.get('vcodec') != 'none' and f.get('acodec') != 'none':
+                            url = f.get('url')
+                            break
+
+                if url:
+                    s.wfile.write(json.dumps({"status": "ok", "url": url, "title": info.get('title')}).encode())
                 else:
-                    res = {"status": "err", "msg": "No progressive formats found"}
-                
-                s.wfile.write(json.dumps(res).encode())
+                    s.wfile.write(json.dumps({"status": "err", "msg": "Could not find progressive format"}).encode())
 
         except Exception as e:
             s.wfile.write(json.dumps({"status": "err", "msg": str(e)}).encode())
