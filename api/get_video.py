@@ -19,7 +19,7 @@ class handler(BaseHTTPRequestHandler):
             return
 
         # Пробуємо цей інстанс, він зараз найживіший
-        api_url = "https://cobalt-api.v0.sh/" 
+        api_url = "https://api.cobalt.tools" 
         # Якщо знову буде NameResolutionError, спробуй цей: "https://api.cobalt.tools/"
         
         headers = {
