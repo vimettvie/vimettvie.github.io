@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inhook :: YouTube Downloader</title>
+    <title>Inhook YouTube Downloader</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kalnia:wght@400&display=swap" rel="stylesheet">
@@ -171,5 +171,53 @@
             }
         }
     </script>
+    function updateClock() {
+    const now = new Date();
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+
+    hours = hours % 12;
+    hours = hours ? hours : 12; // якщо 0, то ставимо 12
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+
+    const strTime = hours + ':' + minutes + ' ' + ampm;
+    document.getElementById('clock').innerText = strTime;
+}
+
+// Запускаємо годинник відразу і оновлюємо кожну секунду
+setInterval(updateClock, 1000);
+updateClock();
+
+// Твоя основна функція завантаження
+async function downloadVideo() {
+    const urlInput = document.getElementById('videoUrl').value;
+    const resultDiv = document.getElementById('result');
+    const button = document.querySelector('button');
+    
+    if (!urlInput) return;
+
+    button.disabled = true;
+    button.innerText = 'Wait';
+    resultDiv.style.display = 'none';
+
+    try {
+        const response = await fetch(`/api/get_video?url=${encodeURIComponent(urlInput)}`);
+        const data = await response.json();
+
+        if (data.status === 'ok') {
+            document.getElementById('videoTitle').innerText = `TITLE: ${data.title}`;
+            document.getElementById('downloadLink').href = data.url;
+            resultDiv.style.display = 'block';
+        } else {
+            alert('ERROR: INVALID_LINK');
+        }
+    } catch (error) {
+        alert('CONNECTION_FAILED');
+    } finally {
+        button.disabled = false;
+        button.innerText = 'Enter';
+    }
+}
 </body>
 </html>
