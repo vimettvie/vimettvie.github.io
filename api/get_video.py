@@ -17,36 +17,39 @@ class handler(BaseHTTPRequestHandler):
         try:
             raw_cookies = os.environ.get("YT_COOKIES")
             if raw_cookies:
-                cookies_json = json.loads(raw_cookies)
                 with open(cookie_path, "w") as f:
                     f.write("# Netscape HTTP Cookie File\n")
-                    for c in cookies_json:
+                    for c in json.loads(raw_cookies):
                         domain = c.get('domain', '')
                         flag = "TRUE" if domain.startswith(".") else "FALSE"
-                        p = c.get('path', '/')
-                        sec = "TRUE" if c.get('secure') else "FALSE"
-                        exp = int(c.get('expirationDate', 0))
-                        name = c.get('name', '')
-                        val = c.get('value', '')
-                        f.write(f"{domain}\t{flag}\t{p}\t{sec}\t{exp}\t{name}\t{val}\n")
+                        f.write(f"{domain}\t{flag}\t{c.get('path', '/')}\t{'TRUE' if c.get('secure') else 'FALSE'}\t{int(c.get('expirationDate', 0))}\t{c.get('name', '')}\t{c.get('value', '')}\n")
             opts = {
-                'format': '22/18/best[vcodec!=none][acodec!=none]',
                 'cookiefile': cookie_path if raw_cookies else None,
                 'quiet': True,
                 'no_warnings': True,
                 'nocheckcertificate': True,
-                'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
             }
+
             with yt_dlp.YoutubeDL(opts) as ydl:
                 info = ydl.extract_info(u, download=False)
-                res = {
-                    "status": "ok",
-                    "url": info.get('url'),
-                    "title": info.get('title')
-                }
+                formats = info.get('formats', [])
+                good_formats = [f for f in formats if f.get('acodec') != 'none' and f.get('vcodec') != 'none' and f.get('url')]
+                good_formats.sort(key=lambda x: x.get('height', 0), reverse=True)
+
+                if good_formats:
+                    best = good_formats[0]
+                    res = {
+                        "status": "ok",
+                        "url": best['url'],
+                        "title": info.get('title'),
+                        "quality": best.get('height')
+                    }
+                else:
+                    res = {"status": "err", "msg": "YouTube restricted direct formats for this video"}
+                
                 s.wfile.write(json.dumps(res).encode())
+
         except Exception as e:
             s.wfile.write(json.dumps({"status": "err", "msg": str(e)}).encode())
         finally:
-            if os.path.exists(cookie_path):
-                os.remove(cookie_path)
+            if os.path.exists(cookie_path): os.remove(cookie_path)
