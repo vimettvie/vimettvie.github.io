@@ -1,4 +1,4 @@
-import requests, json
+import requests, json, re
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 
@@ -15,38 +15,37 @@ class handler(BaseHTTPRequestHandler):
         
         if not u: return
 
-        # Список робочих інстансів (дзеркал)
-        endpoints = [
-            "https://cobalt.api.unblock.casa/api/json",
-            "https://api.cobalt.tools/api/json",
-            "https://cobalt-api.kwiat.xyz/api/json"
-        ]
+        try:
+            # Спроба через інший шлюз (AIO)
+            # Ми шлемо запит на сервіс, який агрегує різні методи скачування
+            r = requests.post(
+                "https://api.download.tube/info",
+                params={"url": u},
+                timeout=10
+            )
+            d = r.json()
+            
+            # Шукаємо лінк у купі даних, які вони повертають
+            streams = d.get('streams', [])
+            # Шукаємо mp4 з відео та аудіо (найкраща якість)
+            video = next((s for s in streams if s.get('extension') == 'mp4' and s.get('url')), None)
+            
+            if video:
+                s.wfile.write(json.dumps({
+                    "status": "ok", 
+                    "url": video['url'], 
+                    "title": d.get('title', 'Video')
+                }).encode())
+                return
+            
+            # Якщо перший не спрацював, пробуємо запасний через інший API
+            r2 = requests.get(f"https://api.boxvideo.top/api/video?url={u}", timeout=5)
+            d2 = r2.json()
+            if d2.get('url'):
+                s.wfile.write(json.dumps({"status": "ok", "url": d2['url']}).encode())
+                return
 
-        for api in endpoints:
-            try:
-                r = requests.post(
-                    api,
-                    headers={
-                        "Accept": "application/json",
-                        "Content-Type": "application/json"
-                    },
-                    json={
-                        "url": u,
-                        "vQuality": "720",
-                        "vCodec": "h264"
-                    },
-                    timeout=5
-                )
-                d = r.json()
-                
-                # Шукаємо лінк
-                l = d.get('url') or (d.get('picker')[0].get('url') if d.get('picker') else None)
-                
-                if l:
-                    s.wfile.write(json.dumps({"status": "ok", "url": l}).encode())
-                    return # Виходимо, якщо знайшли
-            except:
-                continue # Якщо цей сервак ліг, пробуємо наступний
+        except Exception as e:
+            s.wfile.write(json.dumps({"status": "err", "msg": "STILL_BLOCKED"}).encode())
 
-        # Якщо пройшли по всіх і глухо
-        s.wfile.write(json.dumps({"status": "err", "msg": "ALL_NODES_BLOCKED"}).encode())
+        s.wfile.write(json.dumps({"status": "err", "msg": "LAST_CHANCE_FAILED"}).encode())
