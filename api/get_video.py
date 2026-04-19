@@ -19,37 +19,28 @@ class handler(BaseHTTPRequestHandler):
             return
 
         try:
-            api = "https://api.cobalt.tools/api/json"
-            headers = {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }
-            payload = {
-                "url": v_url,
-                "videoQuality": "720",
-                "vCodec": "h264",
-                "isAudioOnly": False
-            }
-            
-            r = requests.post(api, json=payload, headers=headers)
-            data = r.json()
+            r = requests.post(
+                "https://api.cobalt.tools/api/json",
+                headers={
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "url": v_url,
+                    "videoQuality": "720",
+                    "vCodec": "h264"
+                },
+                timeout=10
+            )
+            d = r.json()
+            f_url = d.get('url') or (d.get('picker')[0].get('url') if d.get('picker') else None)
 
-            if data.get('status') == 'stream':
-                res = {
-                    "status": "ok",
-                    "url": data.get('url'),
-                    "title": "Video Ready"
-                }
-            elif data.get('status') == 'redirect':
-                res = {
-                    "status": "ok",
-                    "url": data.get('url'),
-                    "title": "Redirect Ready"
-                }
+            if f_url:
+                res = {"status": "ok", "url": f_url, "title": "Video Found"}
             else:
-                res = {"status": "error", "msg": data.get('text')}
+                res = {"status": "error", "msg": "API Blocked"}
 
             s.wfile.write(json.dumps(res).encode())
 
-        except Exception as e:
-            s.wfile.write(json.dumps({"status": "error", "dev": str(e)}).encode())
+        except:
+            s.wfile.write(json.dumps({"status": "error", "msg": "System down"}).encode())
