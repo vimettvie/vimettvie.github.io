@@ -1,1 +1,173 @@
-its a inhook.xyz site. wait for end a development
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>youtube downloader --inhook</title>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-color: #00ff41;
+            --border-color: #008f11;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .container {
+            border: 1px solid var(--text-color);
+            padding: 30px;
+            width: 90%;
+            max-width: 650px;
+            box-shadow: 0 0 10px var(--border-color);
+        }
+
+        h1 {
+            font-size: 24px;
+            text-align: center;
+            border-bottom: 1px solid var(--text-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        .status-bar {
+            font-size: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .input-area {
+            margin: 40px 0;
+        }
+
+        input[type="text"] {
+            background: #000;
+            border: 1px solid var(--text-color);
+            color: var(--text-color);
+            padding: 12px;
+            width: calc(100% - 26px);
+            font-size: 16px;
+            outline: none;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        button {
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            padding: 10px 25px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        button:hover {
+            background: var(--text-color);
+            color: #000;
+        }
+
+        #result {
+            margin-top: 30px;
+            display: none;
+            border: 1px dashed var(--text-color);
+            padding: 20px;
+        }
+
+        .download-link {
+            display: block;
+            margin-top: 20px;
+            color: #000;
+            background: var(--text-color);
+            text-decoration: none;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 10px;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="status-bar">
+            <span>CORE_v1.0</span>
+            <span>STATUS: ONLINE</span>
+        </div>
+        
+        <h1>Inhook Video Downloader</h1>
+        
+        <div class="input-area">
+            <div>> USER_INPUT_URL:</div>
+            <br>
+            <input type="text" id="videoUrl" placeholder="ENTER LINK HERE..." spellcheck="false">
+            <button onclick="runExploit()">EXECUTE FETCH</button>
+        </div>
+
+        <div id="loader" class="loader">ACCESSING REMOTE SERVER... [##########]</div>
+
+        <div id="result">
+            <div id="videoTitle" style="margin-bottom: 10px;">FILE: UNKNOWN</div>
+            <div style="font-size: 12px; margin-bottom: 15px;">SOURCE: YOUTUBE_DATABASE</div>
+            <a href="#" id="downloadLink" class="download-link" target="_blank">DOWNLOAD_STREAM</a>
+        </div>
+    </div>
+
+    <footer>
+        SECURE CONNECTION ESTABLISHED // 2026
+    </footer>
+
+    <script>
+        async function runExploit() {
+            const urlInput = document.getElementById('videoUrl').value;
+            const resultDiv = document.getElementById('result');
+            const loader = document.getElementById('loader');
+            
+            if (!urlInput) return;
+
+            loader.style.display = 'block';
+            resultDiv.style.display = 'none';
+
+            try {
+                const response = await fetch(`/api/get_video?url=${encodeURIComponent(urlInput)}`);
+                const data = await response.json();
+
+                if (data.status === 'ok') {
+                    document.getElementById('videoTitle').innerText = `FILE: ${data.title}`;
+                    document.getElementById('downloadLink').href = data.url;
+                    resultDiv.style.display = 'block';
+                } else {
+                    alert('STREAMS_ERROR: ' + data.error);
+                }
+            } catch (error) {
+                alert('CONNECTION_FAILED');
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
