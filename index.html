@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inhook :: Downloader</title>
+<title>Inhook</title>
 <link href="https://fonts.googleapis.com/css2?family=Kalnia&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -24,61 +24,7 @@ body{background:#000;color:#fff;font-family:'Kalnia',serif;height:100vh;display:
 
 <div class="wrapper">
     <div class="header-top">
-        <div class="logo-txt">YouTube<br>Downloader</div>
-        <div id="clk">00:00 --</div>
-    </div>
-    <div class="input-wrap">
-        <input type="text" id="url_in" placeholder="URL">
-        <button class="go-btn" id="btn_go">Enter</button>
-    </div>
-    <div id="res_box">
-        <div id="vid_name" style="font-size:16px;margin-bottom:10px">Ready to download</div>
-        <a href="#" id="final_link" class="dl-btn" target="_blank">Download File</a>
-    </div>
+        <div class="logo-txt">Get-AppXPackage -AllUsers | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}<br> fonttt</div>
 </div>
-
-<script>
-const clk = document.getElementById('clk');
-const inp = document.getElementById('url_in');
-const go = document.getElementById('btn_go');
-const out = document.getElementById('res_box');
-
-setInterval(() => {
-    let d = new Date();
-    let h = d.getHours(), m = d.getMinutes(), s = h >= 12 ? 'PM' : 'AM';
-    h = h % 12 || 12;
-    clk.textContent = h + ':' + (m < 10 ? '0' + m : m) + ' ' + s;
-}, 1000);
-
-const getIt = async () => {
-    let val = inp.value.trim();
-    if(!val) return;
-    go.disabled = true;
-    go.textContent = '...';
-    out.style.display = 'none';
-
-    try {
-        const r = await fetch('/api/get_video?url=' + encodeURIComponent(val));
-        const res = await r.json();
-        
-        console.log("RAW_RES:", res); // ДИВИСЬ СЮДИ В КОНСОЛЬ
-
-        if (res.status === 'ok' && res.url) {
-            document.getElementById('final_link').href = res.url;
-            out.style.display = 'block';
-        } else {
-            alert('API ERROR: ' + (res.msg || 'unknown'));
-        }
-    } catch(e) {
-        alert('FETCH ERROR: ' + e.message);
-    } finally {
-        go.disabled = false;
-        go.textContent = 'Enter';
-    }
-};
-
-go.onclick = getIt;
-inp.onkeypress = (e) => { if(e.key == 'Enter') getIt(); };
-</script>
 </body>
 </html>
