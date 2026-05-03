@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Для тебе 💜</title>
+    <style>
+        body {
+            background-color: #f0f4f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 350px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Конверт */
+        .envelope {
+            position: relative;
+            width: 280px;
+            height: 180px;
+            background: #2e7d32;
+            border-radius: 0 0 10px 10px;
+            cursor: pointer;
+            transition: 0.5s ease;
+            z-index: 2;
+        }
+
+        .envelope:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-left: 140px solid transparent;
+            border-right: 140px solid transparent;
+            border-top: 110px solid #4caf50;
+            transform-origin: top;
+            transition: 0.4s;
+        }
+
+        /* Лист, який з'являється замість конверта */
+        .message {
+            display: none; /* Спочатку схований */
+            width: 100%;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            color: #1b5e20;
+            font-size: 17px;
+            line-height: 1.6;
+            text-align: center;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Клас при кліку */
+        .active .envelope {
+            display: none;
+        }
+
+        .active .message {
+            display: block;
+        }
+
+        .hint {
+            position: absolute;
+            bottom: -50px;
+            width: 100%;
+            text-align: center;
+            color: #4caf50;
+            font-weight: bold;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="mainContainer" onclick="this.classList.add('active')">
+    
+    <div class="envelope">
+        <div class="hint">жмякни щоб відкрити </div>
+    </div>
+
+    <div class="message">
+        <strong>Привіт💗</strong><br><br>
+        Привіт, сонечко💗
+
+        Навіть не віриться що пройшло вже цілих 6 місяців. За цей час я встиг посправжньому сильно полюбити тебе. Я люблю твою неймовірну красоту, твою чесність та твій характер якій є тільки в тобі 🥰
+
+        З тобою кожен день стає кращим. Я дуже ціную те що ми є один в одного і щиро надіюся що наші стосунки будуть жити та ставати тільки міцнішими до самого кінця нашого життя 💜💜
+
+        Ти моя найближча людина. Дякую тобі за те що ти завжди поруч, за твою підтримку і за то що ти така яка ти є.<br><br>
+    </div>
+
+</div>
+
+<script>
+    document.getElementById('mainContainer').onclick = function() {
+        this.classList.add('active');
+    };
+</script>
+
+</body>
+</html>
