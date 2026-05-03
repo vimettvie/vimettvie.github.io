@@ -1,30 +1,110 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inhook</title>
-<link href="https://fonts.googleapis.com/css2?family=Kalnia&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#000;color:#fff;font-family:'Kalnia',serif;height:100vh;display:flex;align-items:center;justify-content:center}
-.wrapper{width:100%;max-width:950px;padding:30px}
-.header-top{display:flex;justify-content:space-between;margin-bottom:60px;align-items:flex-start}
-.logo-txt{font-size:50px;line-height:0.9}
-#clk{font-size:80px;line-height:0.8;letter-spacing:-2px}
-.input-wrap{display:flex;gap:10px}
-#url_in{flex:1;background:#151515;color:#fff;border:none;border-radius:6px;padding:18px 25px;font-family:inherit;font-size:18px;outline:none}
-#url_in::placeholder{color:#222}
-.go-btn{background:#252525;color:#fff;border:none;border-radius:6px;padding:0 40px;font-family:inherit;font-size:18px;cursor:pointer}
-#res_box{margin-top:50px;display:none;background:#111;padding:25px;border-radius:8px}
-.dl-btn{display:inline-block;background:#fff;color:#000;text-decoration:none;padding:12px 25px;border-radius:4px;font-weight:bold;margin-top:15px}
-</style>
+    <meta charset="UTF-8">
+    <title>FlowChan — Інфо</title>
+    <style>
+        body {
+            background-color: #e8f5e9;
+            color: #1b5e20;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #2e7d32;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid #1b5e20;
+        }
+
+        .main-img {
+            display: block;
+            margin: 20px auto;
+            max-width: 90%;
+            height: auto;
+            border: 5px solid #2e7d32;
+        }
+
+        .content {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border: 1px solid #c8e6c9;
+        }
+
+        h1, h2 {
+            color: #2e7d32;
+            border-bottom: 2px solid #a5d6a7;
+            padding-bottom: 10px;
+        }
+
+        .description {
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+
+        .info-box {
+            background-color: #f1f8e9;
+            border-left: 5px solid #8bc34a;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .tags {
+            font-family: monospace;
+            background: #f1f8e9;
+            padding: 10px;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
 
-<div class="wrapper">
-    <div class="header-top">
-        <div class="logo-txt">Get-AppXPackage -AllUsers | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}<br> fonttt</div>
+<header>
+    <h1>FlowChan</h1>
+</header>
+
+<div class="content">
+    <img src="mf.png" alt="FlowChan Image" class="main-img">
+
+    <div class="description">
+        <p><strong>FlowChan</strong> — це спільнота людей у соцмережі <strong>Мрія</strong>, які об'єднані слоганом "FlowChan" у статусі.</p>
+        
+        <h2>Про групу</h2>
+        <p>Ми займаємося створенням хаотичних мемів, артів та щитпостів. Це творчість, яку розуміємо ми, або просто якісні загальнодоступні меми.</p>
+        
+        <div class="info-box">
+            <strong>Сенс:</strong> Абсурдні меми та вільна творчість.<br>
+            <strong>Ідеологія:</strong> Радикальний пофігізм.
+        </div>
+
+        <h2>Наші принципи</h2>
+        <ul>
+            <li><strong>Френдлі вайб:</strong> Учасники мають бути дружніми.</li>
+            <li><strong>Захист без агресії:</strong> При будь-яких нападах на FlowChan ми не проявляємо агресію у відповідь, а лише захищаємо свою ідею.</li>
+            <li><strong>Повага до правил:</strong> Ми притримуємося правил використання Мрії. Наша мета — просувати творчість у топи, а не спамити.</li>
+        </ul>
+
+        <h2>Хештеги</h2>
+        <p>Шукайте наші пости за тегами:</p>
+        <p class="tags">#FlowChan &nbsp;&nbsp; #FlowChan&Mriya</p>
+    </div>
 </div>
+
+<footer>
+    <p>Інформаційний сайт FlowChan &copy; 2026</p>
+</footer>
+
 </body>
 </html>
