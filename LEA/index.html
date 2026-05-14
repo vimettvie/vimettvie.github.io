@@ -5,125 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Для тебе 💜</title>
     <style>
-        :root {
-            --primary: #6a1b9a;
-            --accent: #ff4081;
-        }
-
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background: #fff0f5;
-        }
-
-        #bgCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            touch-action: manipulation;
-        }
-
-        .container {
-            position: relative;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            z-index: 10;
-        }
-
-        .envelope-wrapper {
-            position: relative;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .envelope {
-            position: relative;
-            width: 280px;
-            height: 180px;
-            background: #2e7d32;
-            border-radius: 0 0 10px 10px;
-            margin: 0 auto;
-            z-index: 2;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .envelope:before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0;
-            border-left: 140px solid transparent;
-            border-right: 140px solid transparent;
-            border-top: 110px solid #4caf50;
-            transform-origin: top;
-            transition: 0.4s;
-        }
-
-        .message {
-            display: none;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 25px;
-            border-radius: 25px;
-            box-shadow: 0 15px 35px rgba(106, 27, 154, 0.15);
-            color: #4a148c;
-            animation: slideUp 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(80px) scale(0.8); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .heart-button {
-            display: none;
-            background: linear-gradient(45deg, #ff4081, #ec407a);
-            color: white;
-            border: none;
-            padding: 18px 35px;
-            border-radius: 50px;
-            font-size: 20px;
-            font-weight: bold;
-            margin: 25px auto;
-            box-shadow: 0 8px 20px rgba(255, 64, 129, 0.3);
-            cursor: pointer;
-        }
-
+        :root { --primary: #6a1b9a; --accent: #ff4081; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', Roboto, sans-serif; background: #fff0f5; }
+        #bgCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; touch-action: manipulation; }
+        .container { position: relative; width: 90%; max-width: 400px; text-align: center; z-index: 10; }
+        .envelope-wrapper { position: relative; cursor: pointer; transition: transform 0.3s ease; }
+        .envelope { position: relative; width: 280px; height: 180px; background: #2e7d32; border-radius: 0 0 10px 10px; margin: 0 auto; z-index: 2; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .envelope:before { content: ""; position: absolute; top: 0; left: 0; border-left: 140px solid transparent; border-right: 140px solid transparent; border-top: 110px solid #4caf50; transform-origin: top; transition: 0.4s; }
+        .message { display: none; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 25px; border-radius: 25px; box-shadow: 0 15px 35px rgba(106, 27, 154, 0.15); color: #4a148c; animation: slideUp 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(80px) scale(0.8); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .heart-button { display: none; background: linear-gradient(45deg, #ff4081, #ec407a); color: white; border: none; padding: 18px 35px; border-radius: 50px; font-size: 20px; font-weight: bold; margin: 25px auto; box-shadow: 0 8px 20px rgba(255, 64, 129, 0.3); cursor: pointer; }
         #counter { font-size: 26px; display: block; margin-top: 5px; }
-
         .active .envelope-wrapper { display: none; }
         .active .message, .active .heart-button { display: block; }
-
-        .hint { 
-            margin-top: 25px; 
-            color: #1b5e20; 
-            font-weight: bold; 
-            font-size: 18px;
-            animation: bounce 1.5s infinite; 
-        }
-        @keyframes bounce { 
-            0%, 100% { transform: translateY(0); } 
-            50% { transform: translateY(-12px); } 
-        }
+        .hint { margin-top: 25px; color: #1b5e20; font-weight: bold; font-size: 18px; animation: bounce 1.5s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
     </style>
 </head>
-<body>
+<body onclick="initAudio()"> <!-- Додав ініціалізацію на перший клік -->
 
-<audio id="bgMusic" loop>
+<audio id="bgMusic" loop playsinline preload="auto">
     <source src="music.mp3" type="audio/mpeg">
 </audio>
 
@@ -132,7 +34,7 @@
 <div class="container" id="mainContainer">
     <div class="envelope-wrapper" onclick="openEnvelope()">
         <div class="envelope"></div>
-        <div class="hint">жмякни щоб відкрити </div>
+        <div class="hint">жмякни щоб відкрити</div>
     </div>
 
     <div class="message">
@@ -155,7 +57,16 @@
     const ctx = canvas.getContext('2d');
     const audio = document.getElementById('bgMusic');
     let hearts = [];
-    const colors = ['#ff80ab', '#ff4081', '#f48fb1', '#ce93d8', '#ba68c8'];
+    let audioStarted = false;
+
+    function initAudio() {
+        if (!audioStarted) {
+            audio.play().then(() => {
+                audio.pause(); 
+                audioStarted = true;
+            }).catch(e => console.log("Safari ще чекає"));
+        }
+    }
 
     function resize() {
         canvas.width = window.innerWidth;
@@ -165,46 +76,30 @@
     resize();
 
     function drawHeart(x, y, size, color, opacity) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.translate(x, y);
-        ctx.scale(size, size);
-        ctx.moveTo(0, 0);
-        ctx.bezierCurveTo(-5, -5, -10, 5, 0, 12);
-        ctx.bezierCurveTo(10, 5, 5, -5, 0, 0);
-        ctx.fillStyle = color;
-        ctx.globalAlpha = opacity;
-        ctx.fill();
-        ctx.restore();
+        ctx.save(); ctx.beginPath(); ctx.translate(x, y); ctx.scale(size, size);
+        ctx.moveTo(0, 0); ctx.bezierCurveTo(-5, -5, -10, 5, 0, 12); ctx.bezierCurveTo(10, 5, 5, -5, 0, 0);
+        ctx.fillStyle = color; ctx.globalAlpha = opacity; ctx.fill(); ctx.restore();
     }
 
     class Heart {
-        constructor(isUserGenerated = false) {
-            this.isUserGenerated = isUserGenerated;
-            this.reset();
-        }
+        constructor(isUserGenerated = false) { this.isUserGenerated = isUserGenerated; this.reset(); }
         reset() {
             this.x = Math.random() * canvas.width;
             this.y = this.isUserGenerated ? (window.innerHeight / 2 + 50) : (canvas.height + Math.random() * 200);
             this.size = Math.random() * 1.8 + 0.6;
             this.speed = this.isUserGenerated ? (Math.random() * 4 + 3) : (Math.random() * 1.5 + 0.8);
             this.opacity = Math.random() * 0.6 + 0.3;
-            this.color = colors[Math.floor(Math.random() * colors.length)];
+            this.color = ['#ff80ab', '#ff4081', '#f48fb1', '#ce93d8', '#ba68c8'][Math.floor(Math.random() * 5)];
             this.amplitude = Math.random() * 2 + 1;
             this.offset = Math.random() * 100;
         }
         update() {
             this.y -= this.speed;
             this.x += Math.sin((this.y + this.offset) / 50) * this.amplitude;
-            if (this.y < -50) {
-                if (this.isUserGenerated) return false;
-                this.reset();
-            }
+            if (this.y < -50) { if (this.isUserGenerated) return false; this.reset(); }
             return true;
         }
-        draw() {
-            drawHeart(this.x, this.y, this.size, this.color, this.opacity);
-        }
+        draw() { drawHeart(this.x, this.y, this.size, this.color, this.opacity); }
     }
 
     for (let i = 0; i < 50; i++) hearts.push(new Heart(false));
@@ -223,8 +118,8 @@
 
     function openEnvelope() {
         document.getElementById('mainContainer').classList.add('active');
-        audio.play().catch(e => console.log("Браузер блокує звук до взаємодії"));
-        
+        audio.currentTime = 0;
+        audio.play();
         updateTimer();
         setInterval(updateTimer, 60000); 
     }
