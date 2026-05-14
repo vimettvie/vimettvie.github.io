@@ -123,6 +123,10 @@
 </head>
 <body>
 
+<audio id="bgMusic" loop>
+    <source src="music.mp3" type="audio/mpeg">
+</audio>
+
 <canvas id="bgCanvas"></canvas>
 
 <div class="container" id="mainContainer">
@@ -132,8 +136,8 @@
     </div>
 
     <div class="message">
-        <strong>Привіт, сонечко</strong><br><br>
-        Навіть не віриться, що пройшло вже цілих 6 місяців. За цей час я встиг посправжньому сильно полюбити тебе. Я люблю твою неймовірну красу, твою чесність та твій характер, який є тільки в тобі 🥰<br><br>
+        <strong>Привіт сонечко</strong><br><br>
+        Навіть не віриться що пройшло вже цілих 6 місяців. За цей час я встиг посправжньому сильно полюбити тебе. Я люблю твою неймовірну красу твою чесність та твій характер який є тільки в тобі 🥰<br><br>
         Ти моя найближча людина. Дякую тобі за те що ти така яка ти є.<br>
         <div id="timer" style="font-weight: bold; margin-top: 15px; font-size: 16px; color: #6a1b9a;"></div>
     </div>
@@ -149,6 +153,7 @@
     const startDate = new Date(2025, 10, 15); 
     const canvas = document.getElementById('bgCanvas');
     const ctx = canvas.getContext('2d');
+    const audio = document.getElementById('bgMusic');
     let hearts = [];
     const colors = ['#ff80ab', '#ff4081', '#f48fb1', '#ce93d8', '#ba68c8'];
 
@@ -218,6 +223,8 @@
 
     function openEnvelope() {
         document.getElementById('mainContainer').classList.add('active');
+        audio.play().catch(e => console.log("Браузер блокує звук до взаємодії"));
+        
         updateTimer();
         setInterval(updateTimer, 60000); 
     }
