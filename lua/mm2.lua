@@ -6,18 +6,21 @@ local playerGui = player:WaitForChild("PlayerGui")
 _G.AutoFarm = false
 _G.CoinsCollected = 0
 
--- GUI: Кнопка керування
+-- GUI: Тепер має бути видно на 100%
 local screenGui = Instance.new("ScreenGui", playerGui)
+screenGui.Name = "FarmGUI"
+screenGui.ResetOnSpawn = false
+
 local button = Instance.new("TextButton", screenGui)
-button.Size = UDim2.new(0, 150, 0, 50)
-button.Position = UDim2.new(0.5, -75, 0.9, -50)
+button.Size = UDim2.new(0, 200, 0, 60)
+button.Position = UDim2.new(0.5, -100, 0.8, 0)
 button.Text = "Start AutoFarm"
 button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 button.TextColor3 = Color3.new(1, 1, 1)
 
 button.MouseButton1Click:Connect(function()
     _G.AutoFarm = not _G.AutoFarm
-    button.Text = _G.AutoFarm and "Stop AutoFarm" or "Start AutoFarm"
+    button.Text = _G.AutoFarm and "Stop" or "Start"
     button.BackgroundColor3 = _G.AutoFarm and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(50, 50, 50)
 end)
 
@@ -30,42 +33,39 @@ local function getCoinContainer()
 end
 
 task.spawn(function()
-    while task.wait(0.5) do
+    while task.wait(1) do
         if _G.AutoFarm then
-            local char = player.Character
-            local root = char and char:FindFirstChild("HumanoidRootPart")
-            local humanoid = char and char:FindFirstChild("Humanoid")
             local container = getCoinContainer()
-
-            -- Якщо ти вмер або карти ще нема — просто нічого не робимо
-            if not root or (humanoid and humanoid.Health <= 0) or not container or not container.Parent then
+            if not container or not container.Parent then
                 continue 
             end
 
-            -- Збір монет
+            -- Чекаємо 10 секунд перед початком фарму нової карти
+            task.wait(10)
+
             local coins = container:GetChildren()
             for _, coin in pairs(coins) do
-                -- Перевірка на випадок смерті або вимкнення під час руху
-                if not _G.AutoFarm or not player.Character or player.Character.Humanoid.Health <= 0 then break end
+                if not _G.AutoFarm or player.Character.Humanoid.Health <= 0 then break end
                 
-                if coin:IsA("BasePart") and coin.Parent ~= nil then
-                    -- Розрахунок плавності руху (швидкість 40)
-                    local dist = (root.Position - coin.Position).Magnitude
-                    local tween = TweenService:Create(root, TweenInfo.new(dist / 40, Enum.EasingStyle.Linear), {CFrame = coin.CFrame})
-                    tween:Play()
-                    tween.Completed:Wait()
-                    
-                    _G.CoinsCollected += 1
-                    task.wait(0.3)
+                if coin:IsA("BasePart") then
+                    local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+                    if root then
+                        -- Летимо до монети
+                        local dist = (root.Position - coin.Position).Magnitude
+                        local tween = TweenService:Create(root, TweenInfo.new(dist / 40, Enum.EasingStyle.Linear), {CFrame = coin.CFrame})
+                        tween:Play()
+                        tween.Completed:Wait()
+                        
+                        -- Тепер стоїмо на місці 0.5 сек, щоб гра точно зарахувала збір
+                        task.wait(0.5) 
+                        
+                        _G.CoinsCollected += 1
+                    end
                 end
                 
-                -- Ресет після 40 монет
                 if _G.CoinsCollected >= 40 then
                     _G.CoinsCollected = 0
                     if player.Character then player.Character:BreakJoints() end
-                    
-                    -- Чекаємо 10 секунд після ресету (поки карта зміниться)
-                    task.wait(10) 
                     break 
                 end
             end
