@@ -1,1 +1,41 @@
-заглушка
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; padding: 40px; display: flex; justify-content: center; }
+        main { max-width: 600px; width: 100%; }
+        input, textarea { width: 100%; background: #111; border: 1px solid #333; color: #fff; padding: 10px; margin-bottom: 10px; box-sizing: border-box; }
+        button { background: #fff; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <main>
+        <input type="text" id="id" placeholder="post id (e.g., 8034)">
+        <input type="text" id="title" placeholder="Title">
+        <input type="text" id="author" placeholder="Author">
+        <textarea id="content" rows="10" placeholder="content/ascii/idk"></textarea>
+        <button onclick="sendToServer()">Post</button>
+    </main>
+
+    <script>
+        async function sendToServer() {
+            const data = {
+                id: document.getElementById('id').value,
+                title: document.getElementById('title').value,
+                author: document.getElementById('author').value,
+                content: document.getElementById('content').value
+            };
+            
+            const response = await fetch('http://localhost:5000/create_post', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            
+            if (response.ok) alert("ok");
+            else alert("bro...");
+        }
+    </script>
+</body>
+</html>
