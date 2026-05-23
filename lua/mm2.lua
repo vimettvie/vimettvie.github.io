@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 
-_G.AutoFarm = false
+_G.AutoFarm = true
 _G.CoinsCollected = 0
 
 -- Функція для отримання контейнера з перевіркою
