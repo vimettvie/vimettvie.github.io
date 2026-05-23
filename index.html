@@ -27,7 +27,7 @@
                 content: document.getElementById('content').value
             };
             
-            const response = await fetch('https://dc76-91-231-41-151.ngrok-free.app', {
+            const response = await fetch('https://dc76-91-231-41-151.ngrok-free.app/create_post', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
