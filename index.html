@@ -7,6 +7,7 @@
         main { max-width: 600px; width: 100%; }
         input, textarea { width: 100%; background: #111; border: 1px solid #333; color: #fff; padding: 10px; margin-bottom: 10px; box-sizing: border-box; }
         button { background: #fff; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; }
+        #status { margin-top: 20px; color: #666; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -15,17 +16,23 @@
         <input type="text" id="title" placeholder="Title">
         <input type="text" id="author" placeholder="Author">
         <textarea id="content" rows="10" placeholder="content/ascii/idk"></textarea>
-        <button onclick="sendToServer()">Post</button>
+        <button id="postBtn" onclick="sendToServer()">Post</button>
+        <div id="status"></div>
     </main>
 
     <script>
         async function sendToServer() {
+            const btn = document.getElementById('postBtn');
+            const status = document.getElementById('status');
             const data = {
                 id: document.getElementById('id').value,
                 title: document.getElementById('title').value,
                 author: document.getElementById('author').value,
                 content: document.getElementById('content').value
             };
+            
+            btn.disabled = true;
+            status.innerText = "Wait 10-30 sec, we put ur post in us server...";
             
             try {
                 const response = await fetch('https://dc76-91-231-41-151.ngrok-free.app/create_post', {
@@ -37,14 +44,26 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    // Якщо успіх - просто редіректимо, без алертів
-                    window.location.href = result.url;
+                    let timer = 15;
+                    status.innerText = `its ok, wait to redirect ${timer} sec...`;
+                    
+                    const countdown = setInterval(() => {
+                        timer--;
+                        status.innerText = `its ok, wait to redirect ${timer} sec...`;
+                        if (timer <= 0) {
+                            clearInterval(countdown);
+                            window.location.href = result.url;
+                        }
+                    }, 1000);
                 } else {
-                    // Якщо помилка - показуємо меседж
-                    alert("Помилка, бро: " + result.message);
+                    btn.disabled = false;
+                    status.innerText = "";
+                    alert("3: " + result.message);
                 }
             } catch (error) {
-                alert("Щось пішло не так з підключенням до сервера!");
+                btn.disabled = false;
+                status.innerText = "";
+                alert("server is down");
             }
         }
     </script>
