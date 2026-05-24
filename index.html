@@ -5,7 +5,7 @@
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; padding: 40px; display: flex; justify-content: center; }
         main { max-width: 600px; width: 100%; }
-        input, textarea { width: 100%; background: #111; border: 1px solid #333; color: #fff; padding: 10px; margin-bottom: 10px; box-sizing: border-box; }
+        input, textarea { width: 100%; background: #111; border: 1px solid #333; color: #fff; padding: 10px; margin-bottom: 10px; box-sizing: border-box; font-family: 'Courier New', monospace; }
         .toolbar { margin-bottom: 5px; }
         .toolbar button { background: #222; color: #fff; border: 1px solid #444; padding: 5px 10px; cursor: pointer; margin-right: 5px; }
         .toolbar button:hover { background: #444; }
@@ -20,13 +20,14 @@
         <input type="text" id="author" placeholder="Author">
         
         <div class="toolbar">
-            <button onclick="wrapText('**', '**')">B</button>
-            <button onclick="wrapText('*', '*')">I</button>
-            <button onclick="wrapText('`', '`')">Code</button>
+            <button onclick="wrapText('<b>', '</b>')">B</button>
+            <button onclick="wrapText('<i>', '</i>')">I</button>
+            <button onclick="wrapText('<code>', '</code>')">Code</button>
             <button onclick="addLink()">Link</button>
+            <button onclick="wrapText('<pre class=\'ascii\'>', '</pre>')">ASCII</button>
         </div>
         
-        <textarea id="content" rows="10" placeholder="content/ascii/idk"></textarea>
+        <textarea id="content" rows="15" placeholder="content..."></textarea>
         <button id="postBtn" onclick="sendToServer()">Post</button>
         <div id="status"></div>
     </main>
@@ -43,7 +44,9 @@
 
         function addLink() {
             let url = prompt("Enter URL:", "https://");
-            if (url) wrapText("[", "](" + url + ")");
+            if (url) {
+                wrapText(`<a href="${url}">`, `</a>`);
+            }
         }
 
         async function sendToServer() {
@@ -81,7 +84,7 @@
                 } else {
                     btn.disabled = false;
                     status.innerText = "";
-                    alert("3: " + result.message);
+                    alert("Error: " + result.message);
                 }
             } catch (error) {
                 btn.disabled = false;
